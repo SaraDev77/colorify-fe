@@ -44,6 +44,7 @@
       <span class="flex justify-center place-items-center">No Account ? <RouterLink to="/register"><p class="font-bold underline px-2">Create Account</p></RouterLink></span>
     </div>
   </div>
+  <Toaster/>
 </template>
 
 <script lang="ts" setup>
@@ -54,6 +55,7 @@ import { ref, watch } from 'vue'
 import { useAuthStore } from '../../stores/auth.store'
 import { authSchema } from '../../schemas/authForm.schema'
 import { toTypedSchema } from '@vee-validate/zod'
+import { toast, Toaster } from 'vue-sonner';
 
 const formInputs = ref<formData>({ email: '', password: '' })
 const authStore = useAuthStore()
@@ -77,7 +79,6 @@ const userLogin = async () => {
   try {
     const parsedData = authSchema.safeParse(formInputs.value)
     if (parsedData.success) {
-      console.log('loggedin')
       await authStore.login(formInputs.value)
     } else {
       parsedData.error.issues.forEach((issue) => {
@@ -85,14 +86,14 @@ const userLogin = async () => {
         setFieldError(field, issue.message)
       })
       const errorDetails = parsedData.error.issues.map((err) => err.message).join(', ')
-      console.log(errorDetails)
+     toast.error(errorDetails)
     }
   } catch (err: unknown) {
     if (err && typeof err === 'object' && 'response' in err) {
       const responseErr = err as { response: { data: { message: string } } }
-      console.log(responseErr)
+     toast.error(responseErr)
     } else {
-      console.log('Unexpected error occurred.')
+      toast.error('Unexpected error occurred.')
     }
   }
 }

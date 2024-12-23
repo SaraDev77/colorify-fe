@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col justify-center place-items-center">
+   <div class="min-w-screen min-h-screen flex flex-col justify-center place-items-center">
     <Form :validationSchema="validationSchema" @submit="userRegister">
       <div class="flex flex-col gap-2 bg-slate-50 rounded-lg p-10 w-96">
         <h2 class="font-bold text-xl text-slate-950 mb-4 text-center">
@@ -44,6 +44,7 @@
       <span class="flex justify-center place-items-center">Already Have An Account ? <RouterLink to="/login"><p class="font-bold underline px-2">Login</p></RouterLink></span>
     </div>
   </div>
+  <Toaster/>
 </template>
 
 <script lang="ts" setup>
@@ -55,6 +56,7 @@ import { useAuthStore } from '../../stores/auth.store'
 import { authSchema } from '../../schemas/authForm.schema'
 import { toTypedSchema } from '@vee-validate/zod'
 import { RouterLink } from 'vue-router'
+import { toast, Toaster } from 'vue-sonner';
 
 const formInputs = ref<formData>({ email: '', password: '' })
 const authStore = useAuthStore()
@@ -85,14 +87,14 @@ const userRegister = async () => {
         setFieldError(field, issue.message)
       })
       const errorDetails = parsedData.error.issues.map((err) => err.message).join(', ')
-      console.log(`Validation Error: ${errorDetails}`)
+     toast.error(`Validation Error: ${errorDetails}`)
     }
   } catch (err: unknown) {
     if (err && typeof err === 'object' && 'response' in err) {
       const responseErr = err as { response: { data: { message: string } } }
-      console.log(responseErr.response.data.message)
+     toast.error(responseErr.response.data.message)
     } else {
-      console.log('Unexpected error occurred.')
+     toast.error('Unexpected error occurred.')
     }
   }
 }

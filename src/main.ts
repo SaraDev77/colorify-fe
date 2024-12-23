@@ -9,7 +9,7 @@ import 'primeicons/primeicons.css'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { useAuthStore } from './stores/auth.store'
 import { VueQueryPlugin } from '@tanstack/vue-query'
-
+import { Toaster } from 'sonner'
 /*App Creation*/
 const app = createApp(App)
 
@@ -32,8 +32,8 @@ app.use(pinia)
 // Initialize the auth store and permissions after registering Pinia
 const authStore = useAuthStore()
 authStore.initializePermissions()
-
 /*router use*/
 app.use(router)
-
+/*Sonner*/
+app.component(Toaster)
 app.mount('#app')

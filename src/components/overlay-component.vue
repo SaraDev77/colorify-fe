@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div
       v-if="props.isVisible"
-      class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
+      class="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50"
       @click.self="closeOverlay"
     >
       <div class="bg-gray-100 rounded-lg py-10 px-6 shadow-lg min-w-[30rem]">

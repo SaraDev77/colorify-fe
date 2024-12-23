@@ -1,77 +1,161 @@
 <template>
-   <ActionsToolbar/>
-<div class="flex flex-col gap-10 p-10 min-h-full place-items-center">
- 
-    <div class="w-full h-10 flex justify-center shadow-slate-600 shadow-inner p-2 rounded-md">
-      <img class="w-2/3" :src="brush" />
-    </div>
-   
-  <div class="flex flex-col justify-around py-4">
-  
-    <div class="flex justify-center">
-      <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mx-4">
-        <div
-          v-for="(color, index) in data?.colors"
-          :key="index"
-          class="flex flex-col justify-center place-items-center gap-2"
-        >
+  <div v-if="isLoading" class="min-h-full min-w-full flex justify-center mb-auto mt-24">
+    <LoaderComponent />
+  </div>
+  <div v-else class="flex flex-col min-h-full min-w-full">
+    <ActionsToolbar @search-colors="onSearchColors" />
+  <div  class="flex flex-col gap-10 p-10 min-h-screen place-items-center min-w-full">
+
+    <div class="flex flex-col justify-around py-4 flex-1">
+      <div class="flex justify-center">
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mx-4 ">
           <div
-            class="w-32 h-32 rounded-full hover:animate-bounce shadow-md"
-            :style="{ backgroundColor: color?.color }"
-          ></div>
-          <Message severity="contrast">"{{ color?.quote }}"</Message>
+            v-for="(color, index) in filteredColors"
+            :key="index"
+            class="flex flex-col justify-center place-items-center gap-2"
+          >
+          <RouterLink :to="`/details/${color._id}`">
+            <div
+              class="w-32 h-32 rounded-full hover:animate-bounce shadow-md"
+              :style="{ backgroundColor: '#' + color.color }"
+            ></div></RouterLink>
+            <div class="flex flex-col">
+              <div class="mb-2 flex justify-end gap-2">
+                <i
+                  v-if="authStore.user?.role === UserRole.SUPER_ADMIN"
+                  @click="displayWarningOverlay(color._id)"
+                  class="pi pi-eraser text-slate-950 hover:!text-red-600 cursor-pointer"
+                ></i>
+                <i
+                  @click="displayEditOverlay(color)"
+                  class="pi pi-pencil text-slate-950 hover:!text-sky-600 cursor-pointer"
+                ></i>
+              </div>
+              <Message severity="contrast">{{ color?.quote }}</Message>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="mt-10">
-      <PaginatorComponent
-        :current-page="currentPage"
-        :page-size="pageSize"
-        :total-records="totalRecords!"
-        :onPageChange="pageChange"
-      />
-    </div>
-    
+      <OverlayComponent :is-visible="showOverlay" @closeOverlay="closeEditOverlay">
+        <EditFormComponent :close-overlay="closeEditOverlay" :previousColorData="selectedColor!" />
+      </OverlayComponent>
+      <OverlayComponent :is-visible="showWarningOverlay" @closeOverlay="closeWarningOverlay">
+        <div class="rounded-md flex flex-col justify-center place-items-center gap-4">
+          <h1 class="text-lg text-gray-800 font-semibold">
+            Are you sure you want to delete this color?
+          </h1>
+          <div class="flex gap-2">
+            <Button
+              @click="confirmDelete"
+              class="!bg-red-600 !border-none !px-9 hover:!bg-red-500"
+            >
+              Yes
+            </Button>
+            <Button
+              class="!bg-gray-200 !text-gray-800 !border-none hover:!bg-gray-300"
+              @click="closeWarningOverlay"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </OverlayComponent>
+      <div class="mt-10">
+        <PaginatorComponent
+          :current-page="currentPage"
+          :page-size="pageSize"
+          :total-records="totalRecords"
+          :onPageChange="pageChange"
+        />
+      </div>
+    </div></div>
   </div>
-</div>
 </template>
 
 <script setup lang="ts">
-import brush from '../assets/pngwing.com.png'
-import { computed, ref } from 'vue'
-import { Message } from 'primevue'
-import PaginatorComponent from "../components/paginator-component.vue"
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { colorsService } from '../utils/colorRequests.util'
-import type { PaginatorEvent } from '../models/paginator.model'
-import ActionsToolbar from '../components/actions-toolbar.vue'
+import { computed, ref } from 'vue';
+import { Button, Message } from 'primevue';
+import PaginatorComponent from '../components/paginator-component.vue';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
+import { colorsService } from '../utils/colorRequests.util';
+import type { PaginatorEvent } from '../models/paginator.model';
+import ActionsToolbar from '../components/actions-toolbar.vue';
+import EditFormComponent from '@/components/form/EditFormComponent.vue';
+import OverlayComponent from '@/components/overlay-component.vue';
+import type { Color } from '@/models/color.model';
+import { useAuthStore } from '@/stores/auth.store';
+import { UserRole } from '@/models/userRole.enum';
+import { useDebounceFn, useUrlSearchParams } from '@vueuse/core';
+import LoaderComponent from '../components/loader/loader-component.vue'
 
-const page = ref(1)
-const perPage = ref(10)
-const currentPage = ref(1)
-const pageSize = ref(10)
-const queryClient = useQueryClient()
-const { data } = useQuery({
-  queryKey: ['colors', { page: currentPage.value + 1, limit: perPage.value }],
-  queryFn: () => colorsService.fetchColors(page.value, perPage.value),
-})
+const perPage = ref(10);
+const currentPage = ref(1);
+const pageSize = ref(10);
+const queryClient = useQueryClient();
+const params = useUrlSearchParams();
+const searchQuery = ref(params.search || '');
 
-const pagination = computed(() => data?.value?.pagination ?? {})
-const totalRecords = computed(() => pagination.value.total ?? 0)
+const onSearchColors = useDebounceFn((value: string) => {
+  searchQuery.value = value;
+}, 300);
 
+const { data, isLoading } = useQuery({
+  queryKey: ['colors'],
+  queryFn: () => colorsService.fetchColors(currentPage.value, perPage.value),
+});
+
+const filteredColors = computed(() => {
+  if (isLoading.value || !data.value || !data.value.colors) return [];
+  if (!searchQuery.value) return data.value.colors;
+
+  const searchLowerCase = searchQuery.value.toString().toLowerCase();
+  return data.value.colors.filter((color: Color) =>
+    color.quote.toLowerCase().includes(searchLowerCase)
+  );
+});
+
+const totalRecords = computed(() => data?.value?.pagination?.total || 0);
+const showWarningOverlay = ref(false);
+const showOverlay = ref(false);
+const selectedColor = ref<Color>();
+const authStore = useAuthStore();
 
 const pageChange = (event: PaginatorEvent) => {
-  currentPage.value = event.page+1
-  perPage.value = event.rows
-  pageSize.value = event.rows
-  page.value = currentPage.value
-  queryClient.invalidateQueries({ queryKey: ['colors'] })
-}
+  currentPage.value = event.page + 1;
+  perPage.value = event.rows;
+  queryClient.invalidateQueries({ queryKey: ['colors'] });
+};
 
+const closeEditOverlay = () => {
+  showOverlay.value = false;
+  selectedColor.value = undefined;
+};
+
+const displayEditOverlay = (color: Color) => {
+  selectedColor.value = color;
+  showOverlay.value = true;
+};
+
+const closeWarningOverlay = () => {
+  showWarningOverlay.value = false;
+  selectedColor.value = undefined;
+};
+
+const displayWarningOverlay = (color: Color) => {
+  selectedColor.value = color;
+  showWarningOverlay.value = true;
+};
+
+const confirmDelete = async () => {
+  if (!selectedColor.value?._id) return;
+  mutate(String(selectedColor.value._id));
+};
+
+const { mutate } = useMutation({
+  mutationFn: async (colorId: string) => colorsService.deleteColor(colorId),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['colors'] });
+    closeWarningOverlay();
+  },
+});
 </script>
-
-<!-- <script lang="ts" setup>
-import ColorGallery from '../components/color-gallery.vue'
-import brush from '../assets/pngwing.com.png'
-</script> -->

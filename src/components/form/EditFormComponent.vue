@@ -13,10 +13,12 @@
         name="quote"
         class="w-full h-14 border border-slate-200 p-4 block rounded-md"
         v-bind="quoteAttrs"
+        v-model="quote"
       />
       <p class="!text-red-500 !text-sm">{{ errors.quote }}</p>
     </template>
   </FormComponent>
+  <Toaster/>
 </template>
 
 <script lang="ts" setup>
@@ -25,9 +27,10 @@ import { Field, useForm } from 'vee-validate'
 import { ref, watch } from 'vue'
 import FormComponent from './FormComponent.vue'
 import { toTypedSchema } from '@vee-validate/zod'
-import type { Color } from '../../models/color.model'
+import type { Color, colorRequest } from '../../models/color.model'
 import { addSchema } from '../../schemas/color.schema'
 import { colorsService } from '../../utils/colorRequests.util'
+import { toast, Toaster } from 'vue-sonner';
 
 const queryClient = useQueryClient()
 
@@ -36,9 +39,9 @@ const props = defineProps<{
   previousColorData: Color
 }>()
 
-const formData = ref<Omit<Color, '_id'>>({
-  color: props.previousColorData.color,
+const formData = ref<colorRequest>({
   quote: props.previousColorData.quote,
+  color:props.previousColorData.color
 })
 
 const { defineField, setFieldError, errors } = useForm({
@@ -53,7 +56,7 @@ watch(quote, (newValue) => {
 })
 
 const { mutate } = useMutation({
-  mutationFn: (color: Omit<Color, '_id'>) => {
+  mutationFn: (color: colorRequest) => {
     return colorsService.updateColor(color, props.previousColorData._id)
   },
   onSuccess: () => {
@@ -61,6 +64,7 @@ const { mutate } = useMutation({
     setTimeout(() => {
       props.closeOverlay()
     }, 1000)
+    toast.success('Your Quote Is Successfully Edited , Wohoo!')
   },
 })
 
@@ -75,7 +79,7 @@ const submitData = () => {
         setFieldError(field, issue.message)
       }
     })
-    console.error(parsed.error)
+    toast.error(parsed.error)
   }
 }
 </script>

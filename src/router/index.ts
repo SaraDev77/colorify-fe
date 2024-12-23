@@ -1,23 +1,25 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type NavigationGuard } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import NotFound from '../views/NotFound.vue'
 import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
 import { useAuthStore } from '../stores/auth.store'
 import PortalView from '../views/PortalView.vue'
-// import { colorsService } from '../utils/tasksRequests.util'
+import ColorDetails from '@/views/ColorDetails.vue'
+import { colorsService } from '@/utils/colorRequests.util'
 
-// const routeGuard: NavigationGuard = async (to, from, next) => {
-//   const { id } = to.params
-//   try {
-//     const response = await colorsService.fetchSingleColor(String(id))
 
-//     if (response) next()
-//   } catch (error) {
-//     console.error('Invalid Task ID:', error)
-//     next({ name: 'not-found' })
-//   }
-// }
+const routeGuard: NavigationGuard = async (to, from, next) => {
+  const { id } = to.params
+  try {
+    const response = await colorsService.fetchSingleColor(String(id))
+
+    if (response) next()
+  } catch (error) {
+    console.error('Invalid Task ID:', error)
+    next({ name: 'not-found' })
+  }
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,6 +47,13 @@ const router = createRouter({
       name: 'register',
       component: RegisterView,
       meta: { hideToolbar: true, requiresGuest: true },
+    },
+    {
+      path: '/details/:id',
+      name: 'color-details',
+      component: ColorDetails,
+      beforeEnter: [routeGuard],
+      strict: true,
     },
     {
       name: 'not-found',

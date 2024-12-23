@@ -3,3 +3,5 @@ export type Color = {
   color: string
   quote: string
 }
+
+export type colorRequest = Omit<Color,'_id'>

@@ -3,7 +3,7 @@
     <slot name="formTitle"></slot>
     <div class="flex flex-col gap-2">
       <div class="flex flex-col gap-2">
-        <label for="color" class="text-gray-800 text-lg my-2">Color</label>
+       
         <slot name="color"></slot>
         <hr />
       </div>
@@ -27,7 +27,7 @@
       </div>
     </div>
   </Form>
-  <ToastComponent />
+
 </template>
 
 <script lang="ts" setup>
