@@ -20,7 +20,7 @@ import { Button, IconField, InputIcon, InputText,  } from 'primevue';
 import { computed, ref } from 'vue';
 import { useUrlSearchParams } from '@vueuse/core'
 import OverlayComponent from './overlay-component.vue';
-import AddFormComponent from './form/AddFormComponent.vue';
+import AddFormComponent from './form/add-form.vue';
 
 const showOverlay = ref<boolean>(false)
 const params = useUrlSearchParams('history', { removeNullishValues: true })

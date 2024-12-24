@@ -1,4 +1,4 @@
-import { UserRole } from '../../models/userRole.enum'
+import { UserRole } from '../../models/user-role.enum'
 
 export enum Action {
   CREATE = 'create',

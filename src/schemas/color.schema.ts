@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const addSchema = z.object({
+export const colorSchema = z.object({
   color: z
     .string()
     .min(1, 'Color is required') ,

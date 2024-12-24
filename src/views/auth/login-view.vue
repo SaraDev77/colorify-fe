@@ -53,7 +53,7 @@ import { Field, Form, useForm } from 'vee-validate'
 import type { formData } from '../../models/auth.model'
 import { ref, watch } from 'vue'
 import { useAuthStore } from '../../stores/auth.store'
-import { authSchema } from '../../schemas/authForm.schema'
+import { authSchema } from '../../schemas/auth-form.schema'
 import { toTypedSchema } from '@vee-validate/zod'
 import { toast, Toaster } from 'vue-sonner';
 

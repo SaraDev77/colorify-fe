@@ -36,7 +36,7 @@ import { computed, ref } from 'vue'
 import { Message } from 'primevue'
 import PaginatorComponent from './paginator-component.vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { colorsService } from '../utils/colorRequests.util'
+import { colorsService } from '../utils/color-requests.util'
 import type { PaginatorEvent } from '../models/paginator.model'
 import ActionsToolbar from './actions-toolbar.vue'
 

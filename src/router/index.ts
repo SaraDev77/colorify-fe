@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory, type NavigationGuard } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import NotFound from '../views/NotFound.vue'
-import LoginView from '../views/auth/LoginView.vue'
-import RegisterView from '../views/auth/RegisterView.vue'
+import HomeView from '../views/home-view.vue'
+import NotFound from '../views/not-found.vue'
+import LoginView from '../views/auth/login-view.vue'
+import RegisterView from '../views/auth/register-view.vue'
 import { useAuthStore } from '../stores/auth.store'
-import PortalView from '../views/PortalView.vue'
-import ColorDetails from '@/views/ColorDetails.vue'
-import { colorsService } from '@/utils/colorRequests.util'
+import PortalView from '../views/portal-view.vue'
+import ColorDetails from '@/views/color-details.vue'
+import { colorsService } from '@/utils/color-requests.util'
 
 
 const routeGuard: NavigationGuard = async (to, from, next) => {

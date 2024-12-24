@@ -1,4 +1,4 @@
-import type { UserRole } from './userRole.enum'
+import type { UserRole } from './user-role.enum'
 
 export type User = {
   email: string

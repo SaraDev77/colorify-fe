@@ -5,7 +5,6 @@
   <div v-else class="flex flex-col min-h-full min-w-full">
     <ActionsToolbar @search-colors="onSearchColors" />
   <div  class="flex flex-col gap-10 p-10 min-h-screen place-items-center min-w-full">
-
     <div class="flex flex-col justify-around py-4 flex-1">
       <div class="flex justify-center">
         <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mx-4 ">
@@ -68,23 +67,24 @@
           :onPageChange="pageChange"
         />
       </div>
-    </div></div>
+    </div>
+  </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Button, Message } from 'primevue';
 import PaginatorComponent from '../components/paginator-component.vue';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
-import { colorsService } from '../utils/colorRequests.util';
+import { colorsService } from '../utils/color-requests.util';
 import type { PaginatorEvent } from '../models/paginator.model';
 import ActionsToolbar from '../components/actions-toolbar.vue';
-import EditFormComponent from '@/components/form/EditFormComponent.vue';
+import EditFormComponent from '@/components/form/edit-form.vue';
 import OverlayComponent from '@/components/overlay-component.vue';
 import type { Color } from '@/models/color.model';
 import { useAuthStore } from '@/stores/auth.store';
-import { UserRole } from '@/models/userRole.enum';
+import { UserRole } from '@/models/user-role.enum';
 import { useDebounceFn, useUrlSearchParams } from '@vueuse/core';
 import LoaderComponent from '../components/loader/loader-component.vue'
 
@@ -97,6 +97,7 @@ const searchQuery = ref(params.search || '');
 
 const onSearchColors = useDebounceFn((value: string) => {
   searchQuery.value = value;
+  currentPage.value = 1;
   queryClient.invalidateQueries({ queryKey: ['colors'] })
 }, 500);
 
@@ -121,6 +122,18 @@ const pageChange = (event: PaginatorEvent) => {
   queryClient.invalidateQueries({ queryKey: ['colors'] });
 };
 
+
+watch(currentPage, (newPage) => {
+  params.page = String(newPage);
+});
+
+watch(searchQuery, (newSearch) => {
+  if (newSearch) {
+    params.search = newSearch; 
+  } else {
+    delete params.search;
+  }
+});
 
 const showWarningOverlay = ref(false);
 const showOverlay = ref(false);

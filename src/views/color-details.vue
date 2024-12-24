@@ -12,7 +12,7 @@
 </template>
 <script lang="ts" setup>
 import type { Color } from '@/models/color.model';
-import { colorsService } from '@/utils/colorRequests.util';
+import { colorsService } from '@/utils/color-requests.util';
 import { useQuery } from '@tanstack/vue-query';
 import { useRoute } from 'vue-router'
 import LoaderComponent from '../components/loader/loader-component.vue'
