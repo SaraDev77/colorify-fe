@@ -41,6 +41,10 @@ To run this project, you will need to add the following environment variables to
 Run This App By Typing In Terminal
 
 ```bash
+  npm i 
+```
+
+```bash
   npm run dev
 ```
 
