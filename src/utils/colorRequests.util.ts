@@ -19,18 +19,22 @@ export interface ColorResponse {
 }
 
 export const colorsService = {
-  async fetchColors(page: number, perPage: number) {
-    try {
-      const { data } = await apiClient.get('/api/colors', {
-        params: { page: page, perPage: perPage },
-      })
-      return data
-    } catch (error) {
-      console.error('Error fetching tasks:', error)
-      throw error
-    }
-  },
-
+    async fetchColors(page: number, perPage: number, search: string) {
+      try {
+        const { data } = await apiClient.get('/api/colors', {
+          params: {
+            page,
+            perPage,
+            search, // Include the search parameter in the request
+          },
+        });
+        return data;
+      } catch (error) {
+        console.error('Error fetching colors:', error);
+        throw error;
+      }
+    },
+    
   async fetchSingleColor(id: string): Promise<Color> {
     try {
       const { data } = await apiClient.get<{ color: Color }>(`/api/colors/${id}`)

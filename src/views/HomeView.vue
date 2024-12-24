@@ -10,7 +10,7 @@
       <div class="flex justify-center">
         <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mx-4 ">
           <div
-            v-for="(color, index) in filteredColors"
+            v-for="(color, index) in data?.colors"
             :key="index"
             class="flex flex-col justify-center place-items-center gap-2"
           >
@@ -97,34 +97,35 @@ const searchQuery = ref(params.search || '');
 
 const onSearchColors = useDebounceFn((value: string) => {
   searchQuery.value = value;
-}, 300);
+  queryClient.invalidateQueries({ queryKey: ['colors'] })
+}, 500);
 
 const { data, isLoading } = useQuery({
-  queryKey: ['colors'],
-  queryFn: () => colorsService.fetchColors(currentPage.value, perPage.value),
+  queryKey: ['colors', searchQuery, currentPage, perPage],
+  queryFn: () => colorsService.fetchColors(currentPage.value, perPage.value, searchQuery.value as string),
+  select: (data) => ({
+    colors: data.colors, 
+    pagination: data.pagination, 
+  }),
 });
 
-const filteredColors = computed(() => {
-  if (isLoading.value || !data.value || !data.value.colors) return [];
-  if (!searchQuery.value) return data.value.colors;
-
-  const searchLowerCase = searchQuery.value.toString().toLowerCase();
-  return data.value.colors.filter((color: Color) =>
-    color.quote.toLowerCase().includes(searchLowerCase)
-  );
+const totalRecords = computed(() => {
+  return searchQuery.value
+    ? data?.value?.colors.length || 0
+    : data?.value?.pagination?.total || 0;
 });
-
-const totalRecords = computed(() => data?.value?.pagination?.total || 0);
-const showWarningOverlay = ref(false);
-const showOverlay = ref(false);
-const selectedColor = ref<Color>();
-const authStore = useAuthStore();
 
 const pageChange = (event: PaginatorEvent) => {
   currentPage.value = event.page + 1;
   perPage.value = event.rows;
   queryClient.invalidateQueries({ queryKey: ['colors'] });
 };
+
+
+const showWarningOverlay = ref(false);
+const showOverlay = ref(false);
+const selectedColor = ref<Color>();
+const authStore = useAuthStore();
 
 const closeEditOverlay = () => {
   showOverlay.value = false;
