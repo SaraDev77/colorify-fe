@@ -22,7 +22,7 @@
               <div class="mb-2 flex justify-end gap-2">
                 <i
                   v-if="authStore.user?.role === UserRole.SUPER_ADMIN"
-                  @click="displayWarningOverlay(color._id)"
+                  @click="displayWarningOverlay(color)"
                   class="pi pi-eraser text-slate-950 hover:!text-red-600 cursor-pointer"
                 ></i>
                 <i
@@ -30,7 +30,7 @@
                   class="pi pi-pencil text-slate-950 hover:!text-sky-600 cursor-pointer"
                 ></i>
               </div>
-              <Message severity="contrast">{{ color?.quote }}</Message>
+              <Message severity="contrast" class="!flex !justify-center !min-w-48">{{ color?.quote }}</Message>
             </div>
           </div>
         </div>
@@ -45,7 +45,7 @@
           </h1>
           <div class="flex gap-2">
             <Button
-              @click="confirmDelete"
+              @click="confirmDelete(selectedColor?._id!)"
               class="!bg-red-600 !border-none !px-9 hover:!bg-red-500"
             >
               Yes
@@ -70,6 +70,7 @@
     </div>
   </div>
   </div>
+  <Toaster/>
 </template>
 
 <script setup lang="ts">
@@ -87,6 +88,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { UserRole } from '@/models/user-role.enum';
 import { useDebounceFn, useUrlSearchParams } from '@vueuse/core';
 import LoaderComponent from '../components/loader/loader-component.vue'
+import { toast,Toaster } from 'vue-sonner';
 
 const perPage = ref(10);
 const currentPage = ref(1);
@@ -160,9 +162,9 @@ const displayWarningOverlay = (color: Color) => {
   showWarningOverlay.value = true;
 };
 
-const confirmDelete = async () => {
-  if (!selectedColor.value?._id) return;
-  mutate(String(selectedColor.value._id));
+const confirmDelete = async (colorId:number) => {
+  if (!colorId) return;
+  mutate(String(colorId));
 };
 
 const { mutate } = useMutation({
@@ -170,6 +172,8 @@ const { mutate } = useMutation({
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['colors'] });
     closeWarningOverlay();
+    toast.success("Color Deleted Successfully")
   },
 });
+
 </script>

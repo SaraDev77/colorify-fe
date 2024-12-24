@@ -96,7 +96,6 @@ const submitData = () => {
       }
     })
     toast.error('Recheck Your Entered Data, Please!')
-    toast.error(parsed.error)
   }
 }
 </script>

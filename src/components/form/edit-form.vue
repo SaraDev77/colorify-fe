@@ -79,7 +79,7 @@ const submitData = () => {
         setFieldError(field, issue.message)
       }
     })
-    toast.error(parsed.error)
+    toast.error( "Recheck your entered data,please!")
   }
 }
 </script>
