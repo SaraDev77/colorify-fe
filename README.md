@@ -1,39 +1,52 @@
-# colorify
 
-This template should help get you started developing with Vue 3 in Vite.
+# Colorify 
 
-## Recommended IDE Setup
+A colors app that make you discover colors and write your opinions about them 
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-## Type Support for `.vue` Imports in TS
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+## Technologies 
 
-## Customize configuration
+ - Vue 3 
+ - Vue Router
+ - Pinia Store
+ - TanStack Vue Query
+ - Sonner Toast Messages
+ - CASL ability 
+ - Zod/PrimeVue
+ 
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## Features 
 
-## Project Setup
+ - you can see multiple colors that all have been choosen by you                      
+ - Add/Edit colors if you and admin and you can also delete if you're a super admin
+ - Search for a certain color with the quote on it (BE search)
+ - paginated data that enables you to move through data easily(BE pagination)
+ 
+ 
 
-```sh
-npm install
+
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`VITE_API_BASE_URL
+`
+
+
+
+
+## Run App
+
+Run This App By Typing In Terminal
+
+```bash
+  npm run dev
 ```
 
-### Compile and Hot-Reload for Development
 
-```sh
-npm run dev
-```
+## Backend Connection 
 
-### Type-Check, Compile and Minify for Production
+To get this app fully running you have to connect to the backend repo 
+- https://github.com/SaraDev77/colorify-be
 
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
