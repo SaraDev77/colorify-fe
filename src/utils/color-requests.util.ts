@@ -1,13 +1,13 @@
 import apiClient from '../interceptors/client'
 import type { Color } from '../models/color.model'
 
-// Query parameters interface
+
 export interface QueryParams {
   page: number
   perPage: number
 }
 
-// Response type for fetching colors
+
 export interface ColorResponse {
   colors: Color[]
   pagination: {
@@ -25,7 +25,7 @@ export const colorsService = {
           params: {
             page,
             perPage,
-            search, // Include the search parameter in the request
+            search, 
           },
         });
         return data;
