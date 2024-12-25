@@ -1,4 +1,5 @@
 <template>
+<div class="w-full" v-if="message.length"><Message severity="error" closable>{{ message }}</Message></div>
    <div class="min-w-screen min-h-screen flex flex-col justify-center place-items-center">
     <Form :validationSchema="validationSchema" @submit="userRegister">
       <div class="flex flex-col gap-2 bg-slate-50 rounded-lg p-10 w-96">
@@ -32,6 +33,7 @@
             class="!rounded-md !bg-sky-600 !border-none hover:!bg-sky-500"
             type="submit"
             @click="userRegister"
+            :loading="isLoading"
           >
             Register
           </Button>
@@ -44,11 +46,10 @@
       <span class="flex justify-center place-items-center">Already Have An Account ? <RouterLink to="/login"><p class="font-bold underline px-2">Login</p></RouterLink></span>
     </div>
   </div>
-  <Toaster/>
 </template>
 
 <script lang="ts" setup>
-import { Button } from 'primevue'
+import { Button,Message } from 'primevue'
 import { Field, Form, useForm } from 'vee-validate'
 import type { formData } from '../../models/auth.model'
 import { ref, watch } from 'vue'
@@ -56,18 +57,18 @@ import { useAuthStore } from '../../stores/auth.store'
 import { authSchema } from '../../schemas/auth-form.schema'
 import { toTypedSchema } from '@vee-validate/zod'
 import { RouterLink } from 'vue-router'
-import { toast, Toaster } from 'vue-sonner';
+import type { BackendErrorResponse } from '@/models/error.model'
 
 const formInputs = ref<formData>({ email: '', password: '' })
 const authStore = useAuthStore()
 const validationSchema = toTypedSchema(authSchema)
-
 const { errors, defineField, setFieldError } = useForm({
   validationSchema: toTypedSchema(authSchema),
   initialValues: formInputs.value,
 })
 const [email, emailAttrs] = defineField('email')
 const [password, passwordAttrs] = defineField('password')
+const message = ref('')
 
 watch(email, (newValue) => {
   formInputs.value.email = newValue!
@@ -76,26 +77,58 @@ watch(password, (newValue) => {
   formInputs.value.password = newValue!
 })
 
-const userRegister = async () => {
-  try {
-    const parsedData = authSchema.safeParse(formInputs.value)
-    if (parsedData.success) {
-      await authStore.register(formInputs.value)
-    } else {
-      parsedData.error.issues.forEach((issue) => {
-        const field = issue.path.join('.') as keyof typeof formInputs.value
-        setFieldError(field, issue.message)
-      })
-      const errorDetails = parsedData.error.issues.map((err) => err.message).join(', ')
-     toast.error(`Validation Error: ${errorDetails}`)
-    }
-  } catch (err: unknown) {
-    if (err && typeof err === 'object' && 'response' in err) {
-      const responseErr = err as { response: { data: { message: string } } }
-     toast.error(responseErr.response.data.message)
-    } else {
-     toast.error('Unexpected error occurred.')
-    }
+
+  watch(errors, (newErrors) => {
+  if (!Object.keys(newErrors).length) {
+    message.value = ''; 
   }
-}
+}, { deep: true });
+
+  const showMessage = (msg:string, duration = 20000) => {
+  message.value = msg; 
+  if (msg) {
+    setTimeout(() => {
+      message.value = '';
+    }, duration);
+  }
+};
+
+const isLoading=ref(false)
+
+const userRegister = async () => {
+  const parsedData = authSchema.safeParse(formInputs.value);
+  if (parsedData.success) {
+    try {
+      isLoading.value = true;
+      await authStore.register(formInputs.value)
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        (err as BackendErrorResponse).response &&
+        typeof (err as BackendErrorResponse).response.data === 'object' &&
+        'message' in (err as BackendErrorResponse).response.data
+      ) {
+        const backendMessage = (err as BackendErrorResponse).response.data.message;
+        if (typeof backendMessage === 'string') {
+          showMessage(backendMessage);
+        } else {
+          showMessage('An error occurred, but no message was provided.');
+        }
+      } else {
+        showMessage('An unexpected error occurred. Please try again.');
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  } else {
+    parsedData.error.issues.forEach((issue) => {
+      const field = issue.path.join('.') as keyof typeof formInputs.value;
+      setFieldError(field, issue.message);
+    });
+    const errorDetails = parsedData.error.issues.map((err) => err.message).join(', ');
+    showMessage(errorDetails);
+  }
+};
 </script>

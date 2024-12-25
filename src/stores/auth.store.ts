@@ -1,7 +1,6 @@
 import type { DecodedToken } from '@/models/decoded-token.model'
 import type { User } from '@/models/user.model'
 import router from '@/router'
-import type { LoginResponse } from '@/views/auth/models/login-response.model'
 import { defineAbility, type PureAbility } from '@casl/ability'
 import { jwtDecode } from 'jwt-decode'
 import { defineStore } from 'pinia'
@@ -10,6 +9,7 @@ import type { RouteMeta } from 'vue-router'
 import apiClient from '../interceptors/client'
 import { ROLES_DICTIONARY, type Permission } from '../lib/roles-and-permissions/roles'
 import type { formData } from '../models/auth.model'
+import axios from 'axios'
 export const useAuthStore = defineStore(
   'auth-store',
   () => {
@@ -51,7 +51,7 @@ export const useAuthStore = defineStore(
 
     const login = async (formData: formData): Promise<void> => {
       try {
-        const response = await apiClient.post<LoginResponse>('/api/auth/login', formData)
+        const response = await apiClient.post('/api/auth/login', formData)
         const decodedToken = jwtDecode<DecodedToken>(response.data.accessToken)
         const loggedInUser: User = {
           email: formData.email,
@@ -61,6 +61,14 @@ export const useAuthStore = defineStore(
         setUser(loggedInUser)
         router.replace('/home')
       } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          console.error('Login failed:', error.response.data)
+          console.error('Error status:', error.response.status)
+        } else {
+          console.error('Unexpected error:', error)
+        }
+    
+        // Rethrow the error if necessary
         throw error
       }
     }

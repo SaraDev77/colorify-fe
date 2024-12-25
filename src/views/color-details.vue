@@ -1,15 +1,21 @@
 <template>
-    <div v-if="isLoading" class="min-h-full min-w-full flex justify-center mb-auto mt-24">
+  
+  <div v-if="isLoading" class="min-h-screen min-w-full flex justify-center items-center ">
     <LoaderComponent />
-  </div>
-  <div v-else class="min-w-screen min-h-96 mb-auto " :style="{ backgroundColor: '#' + data?.color }" >
-    <div class="w-full h-full bg-slate-100 flex flex-col justify-self-center p-14 rounded-md shadow-sm" 
-    >
-     <p class="text-xl text-slate-950">Your Color Hex Code Is : #{{ data?.color }}</p>
-     <p class="text-xl text-slate-950">Your Quote For The Color : " {{ data?.quote }} "</p>
+  </div> 
+  <div 
+    v-else
+    class="min-h-screen min-w-full flex justify-center items-center rounded-lg"
+    :style="{ backgroundColor: '#' + data?.color }"
+  >
+    <div class="bg-white bg-opacity-90 rounded-lg shadow-lg p-8 w-96 text-center">
+      <h1 class="text-2xl font-bold mb-4">Your Color Information</h1>
+      <p class="text-gray-700 mb-2"><strong>Hex Code:</strong> #{{ data?.color }}</p>
+      <p class="text-gray-700"><strong>Quote:</strong> "{{ data?.quote }}"</p>
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
 import type { Color } from '@/models/color.model';
 import { colorsService } from '@/utils/color-requests.util';
@@ -30,5 +36,4 @@ const { data, isLoading } = useQuery({
     }
   },
 })
-
 </script>

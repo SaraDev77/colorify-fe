@@ -1,4 +1,5 @@
 <template>
+ <div class="my-4 w-full" v-if="message.length && showMsg"  ><Message severity="error" closable>{{ message }}</Message></div>
   <FormComponent
     :submit-data="submitData"
     :close-overlay="closeOverlay"
@@ -31,14 +32,15 @@ import type { Color, colorRequest } from '../../models/color.model'
 import { colorSchema } from '../../schemas/color.schema'
 import { colorsService } from '../../utils/color-requests.util'
 import { toast, Toaster } from 'vue-sonner';
+import {Message} from 'primevue'
 
 const queryClient = useQueryClient()
-
+const message= ref('')
 const props = defineProps<{
   closeOverlay: () => void
   previousColorData: Color
 }>()
-
+ const showMsg=ref(false)
 const formData = ref<colorRequest>({
   quote: props.previousColorData.quote,
   color:props.previousColorData.color
@@ -54,6 +56,21 @@ const [quote, quoteAttrs] = defineField('quote')
 watch(quote, (newValue) => {
   formData.value.quote = newValue!
 })
+
+watch(errors, (newErrors) => {
+  if (!Object.keys(newErrors).length) {
+    showMsg.value = false;
+    message.value = ''; 
+  }
+}, { deep: true });
+
+const showMessage = (msg:string, duration = 20000) => {
+  message.value = msg; 
+  if (message.value) showMsg.value=true
+  setTimeout(() => {
+    message.value = ''; 
+  }, duration);
+};
 
 const { mutate } = useMutation({
   mutationFn: (color: colorRequest) => {
@@ -72,6 +89,7 @@ const submitData = () => {
   const parsed = colorSchema.safeParse(formData.value)
   if (parsed.success) {
     mutate(formData.value)
+    showMsg.value=false
   } else {
     parsed.error.issues.forEach((issue) => {
       const field = issue.path[0] as keyof typeof formData.value
@@ -79,7 +97,7 @@ const submitData = () => {
         setFieldError(field, issue.message)
       }
     })
-    toast.error( "Recheck your entered data,please!")
+    showMessage( "Recheck your entered data,please!")
   }
 }
 </script>

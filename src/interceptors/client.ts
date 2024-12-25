@@ -26,9 +26,9 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       useAuthStore().setUser(null)
-      router.push({ name: 'portal' })
+      router.push({ name: 'login' })
     }
-    return Promise.reject(error)
+    throw error
   },
 )
 

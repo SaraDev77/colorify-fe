@@ -5,6 +5,5 @@ import PortalComponent from '../components/portal-component.vue'
 <template>
   <main>
     <PortalComponent />
-
   </main>
 </template>

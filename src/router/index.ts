@@ -69,14 +69,20 @@ router.beforeEach((to, from, next) => {
     return next({ name: 'home' })
   }
 
-  if (to.name === 'login' || to.name === 'not-found' || to.name === 'register'||to.name === 'portal') {
-    return next()
-  }
-
   if (!authStore.user) {
+    if (to.name === 'login' || to.name === 'not-found' || to.name === 'register'||to.name === 'portal') {
+      return next()
+    }
     return next({ name: 'portal' })
   }
   next()
 })
+
+
+
+
+
+
+
 
 export default router

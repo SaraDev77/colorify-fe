@@ -1,4 +1,5 @@
 <template>
+   <div class="my-4 w-full " v-if="message.length && showMsg"><Message closable severity="error">{{ message }}</Message></div>
   <FormComponent
     :submit-data="submitData"
     :close-overlay="closeOverlay"
@@ -28,7 +29,7 @@
       <p class="!text-red-500 !text-sm">{{ errors.quote }}</p>
     </template>
   </FormComponent>
-  <Toaster/>
+<Toaster/>
 </template>
 
 <script lang="ts" setup>
@@ -40,12 +41,13 @@ import { toTypedSchema } from '@vee-validate/zod'
 import type { colorRequest } from '../../models/color.model'
 import { colorSchema } from '../../schemas/color.schema'
 import { colorsService } from '../../utils/color-requests.util'
-import { ColorPicker } from 'primevue'
+import { ColorPicker , Message } from 'primevue'
 import { watch } from 'vue'
-import { toast, Toaster } from 'vue-sonner';
+import {toast,Toaster} from 'vue-sonner'
 
+const showMsg=ref(false)
+const message = ref(''); 
 const queryClient = useQueryClient()
-
 const props = defineProps<{
   closeOverlay: () => void
 }>()
@@ -67,9 +69,27 @@ const [quote, quoteAttrs] = defineField('quote')
 watch(color, (newValue) => {
   formData.value.color = newValue!
 })
+
 watch(quote, (newValue) => {
   formData.value.quote = newValue!
 })
+
+watch(errors, (newErrors) => {
+  if (!Object.keys(newErrors).length) {
+    showMsg.value = false;
+    message.value = ''; 
+  }
+}, { deep: true });
+
+
+
+const showMessage = (msg:string, duration = 20000) => {
+  message.value = msg; 
+  if (message.value) showMsg.value=true
+  setTimeout(() => {
+    message.value = ''; 
+  }, duration);
+};
 
 const { mutate } = useMutation({
   mutationFn: (color:colorRequest) => {
@@ -87,6 +107,7 @@ const { mutate } = useMutation({
 const submitData = () => {
   const parsed = colorSchema.safeParse(formData.value)
     if (parsed.success) {
+      showMsg.value=false
     mutate(formData.value)
   } else {
     parsed.error.issues.forEach((issue) => {
@@ -95,7 +116,8 @@ const submitData = () => {
         setFieldError(field, issue.message)
       }
     })
-    toast.error('Recheck Your Entered Data, Please!')
+
+   showMessage('Recheck Your Entered Data, Please!')
   }
 }
 </script>

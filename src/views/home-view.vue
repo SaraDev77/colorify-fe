@@ -4,74 +4,76 @@
   </div>
   <div v-else class="flex flex-col min-h-full min-w-full">
     <ActionsToolbar @search-colors="onSearchColors" />
-  <div  class="flex flex-col gap-10 p-10 min-h-screen place-items-center min-w-full">
-    <div class="flex flex-col justify-around py-4 flex-1">
-      <div class="flex justify-center">
-        <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mx-4 ">
-          <div
-            v-for="(color, index) in data?.colors"
-            :key="index"
-            class="flex flex-col justify-center place-items-center gap-2"
-          >
-          <RouterLink :to="`/details/${color._id}`">
+    <div class="flex flex-col gap-5 p-5 flex-1 overflow-hidden">
+      <div class="flex flex-col justify-around py-4 flex-1 overflow-hidden">
+        <div class="flex justify-center">
+          <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mx-4">
             <div
-              class="w-32 h-32 rounded-full hover:animate-bounce shadow-md"
-              :style="{ backgroundColor: '#' + color.color }"
-            ></div></RouterLink>
-            <div class="flex flex-col">
-              <div class="mb-2 flex justify-end gap-2">
-                <i
-                  v-if="authStore.user?.role === UserRole.SUPER_ADMIN"
-                  @click="displayWarningOverlay(color)"
-                  class="pi pi-eraser text-slate-950 hover:!text-red-600 cursor-pointer"
-                ></i>
-                <i
-                  @click="displayEditOverlay(color)"
-                  class="pi pi-pencil text-slate-950 hover:!text-sky-600 cursor-pointer"
-                ></i>
+              v-for="(color, index) in data?.colors"
+              :key="index"
+              class="flex flex-col justify-center place-items-center gap-2"
+            >
+              <RouterLink :to="`/details/${color._id}`">
+                <div
+                  class="w-32 h-32 rounded-full hover:animate-bounce shadow-md"
+                  :style="{ backgroundColor: '#' + color.color }"
+                ></div>
+              </RouterLink>
+              <div class="flex flex-col">
+                <div class="mb-2 flex justify-end gap-2">
+                  <i
+                    v-if="authStore.user?.role === UserRole.SUPER_ADMIN"
+                    @click="displayWarningOverlay(color)"
+                    class="pi pi-eraser text-slate-950 hover:!text-red-600 cursor-pointer"
+                  ></i>
+                  <i
+                    @click="displayEditOverlay(color)"
+                    class="pi pi-pencil text-slate-950 hover:!text-sky-600 cursor-pointer"
+                  ></i>
+                </div>
+                <Message severity="contrast" class="!flex !justify-center !min-w-48">{{ color?.quote }}</Message>
               </div>
-              <Message severity="contrast" class="!flex !justify-center !min-w-48">{{ color?.quote }}</Message>
             </div>
           </div>
         </div>
-      </div>
-      <OverlayComponent :is-visible="showOverlay" @closeOverlay="closeEditOverlay">
-        <EditFormComponent :close-overlay="closeEditOverlay" :previousColorData="selectedColor!" />
-      </OverlayComponent>
-      <OverlayComponent :is-visible="showWarningOverlay" @closeOverlay="closeWarningOverlay">
-        <div class="rounded-md flex flex-col justify-center place-items-center gap-4">
-          <h1 class="text-lg text-gray-800 font-semibold">
-            Are you sure you want to delete this color?
-          </h1>
-          <div class="flex gap-2">
-            <Button
-              @click="confirmDelete(selectedColor?._id!)"
-              class="!bg-red-600 !border-none !px-9 hover:!bg-red-500"
-            >
-              Yes
-            </Button>
-            <Button
-              class="!bg-gray-200 !text-gray-800 !border-none hover:!bg-gray-300"
-              @click="closeWarningOverlay"
-            >
-              Cancel
-            </Button>
+        <OverlayComponent :is-visible="showOverlay" @closeOverlay="closeEditOverlay">
+          <EditFormComponent :close-overlay="closeEditOverlay" :previousColorData="selectedColor!" />
+        </OverlayComponent>
+        <OverlayComponent :is-visible="showWarningOverlay" @closeOverlay="closeWarningOverlay">
+          <div class="rounded-md flex flex-col justify-center place-items-center gap-4">
+            <h1 class="text-lg text-gray-800 font-semibold">
+              Are you sure you want to delete this color?
+            </h1>
+            <div class="flex gap-2">
+              <Button
+                @click="confirmDelete(selectedColor?._id!)"
+                class="!bg-red-600 !border-none !px-9 hover:!bg-red-500"
+              >
+                Yes
+              </Button>
+              <Button
+                class="!bg-gray-200 !text-gray-800 !border-none hover:!bg-gray-300"
+                @click="closeWarningOverlay"
+              >
+                Cancel
+              </Button>
+            </div>
           </div>
+        </OverlayComponent>
+        <div class="mt-10">
+          <PaginatorComponent
+            :current-page="currentPage"
+            :page-size="pageSize"
+            :total-records="totalRecords"
+            :onPageChange="pageChange"
+          />
         </div>
-      </OverlayComponent>
-      <div class="mt-10">
-        <PaginatorComponent
-          :current-page="currentPage"
-          :page-size="pageSize"
-          :total-records="totalRecords"
-          :onPageChange="pageChange"
-        />
       </div>
     </div>
   </div>
-  </div>
   <Toaster/>
 </template>
+
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
