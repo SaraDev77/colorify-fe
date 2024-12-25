@@ -4,8 +4,8 @@
   </div>
   <div v-else class="flex flex-col min-h-full min-w-full">
     <ActionsToolbar @search-colors="onSearchColors" />
-    <div class="flex flex-col gap-5 p-5 flex-1 overflow-hidden">
-      <div class="flex flex-col justify-around py-4 flex-1 overflow-hidden">
+    <div class="flex flex-col gap-5 p-5 flex-1 overflow-hidden ">
+      <div class="flex flex-col justify-around py-4 flex-1 overflow-y-scroll">
         <div class="flex justify-center">
           <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mx-4">
             <div

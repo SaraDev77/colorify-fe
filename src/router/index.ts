@@ -68,11 +68,12 @@ router.beforeEach((to, from, next) => {
   if (authStore.user && to.meta.requiresGuest) {
     return next({ name: 'home' })
   }
+  if (to.name === 'login' || to.name === 'not-found' || to.name === 'register'||to.name === 'portal') {
+    return next()
+  }
 
   if (!authStore.user) {
-    if (to.name === 'login' || to.name === 'not-found' || to.name === 'register'||to.name === 'portal') {
-      return next()
-    }
+   
     return next({ name: 'portal' })
   }
   next()
