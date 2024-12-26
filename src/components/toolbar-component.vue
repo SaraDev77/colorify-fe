@@ -1,6 +1,6 @@
 <template>
   <div class="card w-full ">
-    <Toolbar style=" padding: 1rem 1rem 1rem 1.5rem">
+    <Toolbar style=" padding: 1rem 1rem 1rem 1.5rem" class="!shadow-md">
       <template #start>
       <RouterLink to="/home" class="flex gap-3"> <Avatar><img :src="image" /></Avatar>
         <h2 class="font-semibold text-lg text-gray-950">Colorify</h2></RouterLink> 
