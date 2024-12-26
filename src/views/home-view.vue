@@ -1,10 +1,11 @@
 <template>
-  <div v-if="isLoading" class="min-h-full min-w-full flex justify-center mb-auto mt-24">
+
+  <div  class="flex flex-col min-h-full min-w-full flex-1">
+    <ActionsToolbar @search-colors="onSearchColors" />
+    <div v-if="isLoading" class="min-h-full min-w-full flex justify-center mb-auto mt-24">
     <LoaderComponent />
   </div>
-  <div v-else class="flex flex-col min-h-full min-w-full flex-1">
-    <ActionsToolbar @search-colors="onSearchColors" />
-    <div class="flex flex-col gap-5 p-5 flex-1 overflow-hidden ">
+    <div v-else-if="data?.colors.length>0" class="flex flex-col gap-5 p-5 flex-1 overflow-hidden ">
       <div class="flex flex-col justify-around py-4 flex-1 overflow-y-scroll">
         <div class="flex justify-center">
           <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mx-4">
@@ -70,6 +71,7 @@
         </div>
       </div>
     </div>
+    <div v-else><NotFound/></div>
   </div>
   <Toaster/>
 </template>
@@ -91,6 +93,7 @@ import { UserRole } from '@/models/user-role.enum';
 import { useDebounceFn, useUrlSearchParams } from '@vueuse/core';
 import LoaderComponent from '../components/loader/loader-component.vue'
 import { toast,Toaster } from 'vue-sonner';
+import NotFound from './not-found.vue';
 
 const perPage = ref(10);
 const currentPage = ref(1);
