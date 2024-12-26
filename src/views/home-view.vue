@@ -2,7 +2,7 @@
   <div v-if="isLoading" class="min-h-full min-w-full flex justify-center mb-auto mt-24">
     <LoaderComponent />
   </div>
-  <div v-else class="flex flex-col min-h-full min-w-full">
+  <div v-else class="flex flex-col min-h-full min-w-full flex-1">
     <ActionsToolbar @search-colors="onSearchColors" />
     <div class="flex flex-col gap-5 p-5 flex-1 overflow-hidden ">
       <div class="flex flex-col justify-around py-4 flex-1 overflow-y-scroll">
