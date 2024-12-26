@@ -1,5 +1,4 @@
 <template>
- <div class="my-4 w-full" v-if="message.length && showMsg"  ><Message severity="error" closable>{{ message }}</Message></div>
   <FormComponent
     :submit-data="submitData"
     :close-overlay="closeOverlay"
@@ -32,7 +31,6 @@ import type { Color, colorRequest } from '../../models/color.model'
 import { colorSchema } from '../../schemas/color.schema'
 import { colorsService } from '../../utils/color-requests.util'
 import { toast, Toaster } from 'vue-sonner';
-import {Message} from 'primevue'
 
 const queryClient = useQueryClient()
 const message= ref('')
@@ -64,14 +62,6 @@ watch(errors, (newErrors) => {
   }
 }, { deep: true });
 
-const showMessage = (msg:string, duration = 20000) => {
-  message.value = msg; 
-  if (message.value) showMsg.value=true
-  setTimeout(() => {
-    message.value = ''; 
-  }, duration);
-};
-
 const { mutate } = useMutation({
   mutationFn: (color: colorRequest) => {
     return colorsService.updateColor(color, props.previousColorData._id)
@@ -97,7 +87,6 @@ const submitData = () => {
         setFieldError(field, issue.message)
       }
     })
-    showMessage( "Recheck your entered data,please!")
   }
 }
 </script>

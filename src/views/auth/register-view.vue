@@ -1,7 +1,8 @@
 <template>
-<div class="w-full" v-if="message.length"><Message severity="error" closable>{{ message }}</Message></div>
    <div class="min-w-screen min-h-screen flex flex-col justify-center place-items-center">
     <Form :validationSchema="validationSchema" @submit="userRegister">
+      <div class="flex flex-col gap-2 w-96 place-items-center">
+        <div class="min-w-96" v-if="message.length"><Message severity="error" class="!flex-1" closable>{{ message }}</Message></div>
       <div class="flex flex-col gap-2 bg-slate-50 rounded-lg p-10 w-96">
         <h2 class="font-bold text-xl text-slate-950 mb-4 text-center">
           <i class="pi pi-palette pr-2 text-sky-400"></i>
@@ -38,7 +39,7 @@
             Register
           </Button>
         </div>
-      </div>
+      </div></div>
     </Form>
     <div
       class="mt-6 text-md text-sky-600 bg-slate-100 rounded-md p-4 bg-opacity-30 w-96 flex justify-center place-items-center gap-2"
